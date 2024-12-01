@@ -1,132 +1,184 @@
 import streamlit as st
 import google.generativeai as genai
+import random
+import time
 
 # Configure the API key securely from Streamlit's secrets
-# Make sure to add GOOGLE_API_KEY in secrets.toml (for local) or Streamlit Cloud Secrets
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
 # Streamlit App UI
-st.title("Fundraising & Fund Management with AI")
-st.write("Use generative AI to optimize your fundraising and fund management processes.")
+st.title("AI Sales Competitor Simulation")
+st.write("""
+    This advanced simulation allows you to train by interacting with AI-driven competitors in different sales scenarios.
+    Choose a sales scenario, customize your competitor's profile, and simulate a conversation for better sales training.
+""")
 
-# Sidebar for selecting which tool to use
-tool_selection = st.sidebar.selectbox(
-    "Select a tool",
-    [
-        "Competitive Fund Tracker Bot",
-        "LP Sentiment Analysis Bot",
-        "Pitch Personalizer Bot",
-        "Carry Calculator Bot",
-        "Vintage Diversification Optimizer Bot",
-    ]
+# Scenario Selection
+scenario = st.selectbox(
+    "Select a Sales Scenario:",
+    ["Negotiating Price", "Handling Objections", "Product Pitch", "Closing a Deal", "Upselling", "Cross-selling", "Discount Negotiation", "Consultative Selling"]
 )
 
-# Competitive Fund Tracker Bot
-if tool_selection == "Competitive Fund Tracker Bot":
-    st.header("Competitive Fund Tracker Bot")
-    st.write("Monitor other funds raising capital and benchmark your fund's performance.")
-    
-    # Input field for fund tracking
-    fund_name = st.text_input("Enter your fund name:", "")
-    competition_data = st.text_area("Enter competitor data (fund names, capital raised, etc.):", "")
-    
-    if st.button("Analyze Competition"):
-        try:
-            # Send data to Gemini to analyze
-            prompt = f"Analyze the competitive landscape for {fund_name} compared to the following competitors: {competition_data}. Provide a benchmark of performance."
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            # Display response
-            st.write("Analysis:")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error: {e}")
+# Competitor Profile Customization
+competitor_style = st.selectbox(
+    "Select Competitor Style:",
+    ["Aggressive", "Passive", "Price-sensitive", "Value-driven", "Relationship-focused", "Hard-nosed", "Emotional", "Data-driven"]
+)
 
-# LP Sentiment Analysis Bot
-elif tool_selection == "LP Sentiment Analysis Bot":
-    st.header("LP Sentiment Analysis Bot")
-    st.write("Analyze LP emails and conversations to detect hesitations or enthusiasm.")
-    
-    # Input field for LP email/text data
-    lp_conversation = st.text_area("Enter LP email or conversation text:", "")
-    
-    if st.button("Analyze Sentiment"):
-        try:
-            # Send data to Gemini to analyze sentiment
-            prompt = f"Analyze the sentiment of the following LP conversation and detect any signs of hesitation or enthusiasm: {lp_conversation}"
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            # Display response
-            st.write("Sentiment Analysis:")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error: {e}")
+# Additional Competitor Customization
+competitor_tone = st.selectbox(
+    "Select Competitor Tone:",
+    ["Friendly", "Formal", "Assertive", "Sarcastic", "Nervous", "Optimistic", "Defensive", "Neutral"]
+)
 
-# Pitch Personalizer Bot
-elif tool_selection == "Pitch Personalizer Bot":
-    st.header("Pitch Personalizer Bot")
-    st.write("Customize fundraising pitches based on LPs' investment history and preferences.")
-    
-    # Input field for LP preferences
-    lp_history = st.text_area("Enter LP's investment history and preferences:", "")
-    
-    if st.button("Personalize Pitch"):
-        try:
-            # Send data to Gemini to generate personalized pitch
-            prompt = f"Personalize a fundraising pitch for an LP with the following investment history and preferences: {lp_history}. Provide a tailored message."
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            # Display response
-            st.write("Personalized Pitch:")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error: {e}")
+competitor_expertise = st.slider(
+    "Competitor Expertise Level (1-10):",
+    1, 10, 5
+)
 
-# Carry Calculator Bot
-elif tool_selection == "Carry Calculator Bot":
-    st.header("Carry Calculator Bot")
-    st.write("Instantly calculate potential carried interest scenarios for various deal structures.")
-    
-    # Input fields for carry calculation parameters
-    deal_structure = st.selectbox("Select deal structure:", ["Traditional", "Hurdle Rate", "European Waterfall", "American Waterfall"])
-    total_fund = st.number_input("Enter total fund size ($):", min_value=1_000_000)
-    carry_percentage = st.slider("Select carry percentage:", 0, 50, 20)
-    
-    if st.button("Calculate Carry"):
-        try:
-            # Send data to Gemini to calculate carry
-            prompt = f"Calculate the carried interest for a {deal_structure} deal structure with a total fund size of ${total_fund} and a carry percentage of {carry_percentage}%. Provide a detailed breakdown of the potential carried interest."
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            # Display response
-            st.write("Carry Interest Calculation:")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error: {e}")
+# Additional Interaction Customization
+sales_experience = st.slider(
+    "Your Sales Experience (1-10):",
+    1, 10, 5
+)
 
-# Vintage Diversification Optimizer Bot
-elif tool_selection == "Vintage Diversification Optimizer Bot":
-    st.header("Vintage Diversification Optimizer Bot")
-    st.write("Advise on fund allocation to achieve a balanced vintage diversification strategy.")
-    
-    # Input fields for vintage diversification
-    total_allocation = st.number_input("Enter total fund allocation ($):", min_value=1_000_000)
-    vintage_years = st.text_area("Enter the vintage years and fund allocation (e.g., 2020: 40%, 2021: 30%, etc.):", "")
-    
-    if st.button("Optimize Diversification"):
-        try:
-            # Send data to Gemini to optimize vintage diversification
-            prompt = f"Advise on how to optimize vintage diversification for a total fund allocation of ${total_allocation} with the following vintage years and allocations: {vintage_years}. Provide suggestions for better diversification."
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            # Display response
-            st.write("Vintage Diversification Optimization:")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error: {e}")
+emotion_detection = st.checkbox("Enable Emotion Detection for Competitor Responses")
 
+# Prompt input field for additional context or specifics
+additional_context = st.text_input("Additional Context (optional):", "")
+
+# Button to generate response
+if st.button("Simulate Competitor Response"):
+    try:
+        # Prepare the prompt based on scenario and competitor style
+        prompt = f"""
+        Sales Scenario: {scenario}
+        Competitor Style: {competitor_style}
+        Competitor Tone: {competitor_tone}
+        Competitor Expertise: {competitor_expertise}
+        Your Sales Experience Level: {sales_experience}
+        """
+        if additional_context:
+            prompt += f"Additional Context: {additional_context}\n"
+        if emotion_detection:
+            prompt += "Enable emotion detection for a more personalized and reactive response."
+
+        # Load and configure the Gemini model
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Generate multiple responses to show variability
+        responses = []
+        for _ in range(3):  # Generate 3 different responses
+            response = model.generate_content(prompt)
+            responses.append(response.text)
+        
+        # Randomly select a response to simulate variability in the competitor's approach
+        selected_response = random.choice(responses)
+        
+        # Display the competitor's response
+        st.write("Competitor's Response:")
+        st.write(selected_response)
+        
+        # Sales Tips and Analysis
+        st.write("\n### Sales Tips for this Scenario:")
+        if "discount" in selected_response.lower():
+            st.write("- Consider offering value before discussing discounts.")
+            st.write("- Be careful with deep discounts; make sure to justify the value you're providing.")
+        elif "objection" in selected_response.lower():
+            st.write("- Address objections empathetically, and always steer the conversation back to value.")
+            st.write("- Validate the customer's concern and offer a solution.")
+        elif "price" in selected_response.lower():
+            st.write("- Always highlight the benefits and value of your product before diving into price negotiations.")
+            st.write("- Keep the conversation focused on how your solution can meet the customer's needs.")
+        elif "upsell" in selected_response.lower():
+            st.write("- Highlight additional features or packages that could benefit the customer.")
+            st.write("- Emphasize how an upgrade can provide long-term value and satisfaction.")
+        else:
+            st.write("- Always personalize your pitch based on the customer’s needs and preferences.")
+        
+        # Scenario progression: introduce progressive difficulty
+        difficulty_level = st.selectbox("Set Difficulty Level", ["Easy", "Medium", "Hard", "Expert"])
+        if difficulty_level == "Medium":
+            st.write("Competitor is slightly tougher now. Prepare for more complex objections.")
+        elif difficulty_level == "Hard":
+            st.write("Competitor is very tough now. Expect complex negotiations and hardball tactics.")
+        elif difficulty_level == "Expert":
+            st.write("You're facing an expert competitor. Prepare for intense negotiation and persuasion techniques.")
+
+        # Continue the conversation: simulate another round of dialogue
+        follow_up = st.text_input("Your Response to Competitor (optional):")
+        if follow_up:
+            follow_up_prompt = f"Customer's Response: {follow_up}\nCompetitor Style: {competitor_style}\nSales Scenario: {scenario}\n"
+            follow_up_response = model.generate_content(follow_up_prompt)
+            st.write("Competitor's Follow-Up Response:")
+            st.write(follow_up_response.text)
+
+        # Performance analytics (example: tracking responses and difficulty)
+        st.write(f"\n### Performance Analytics:")
+        st.write(f"Scenario: {scenario}")
+        st.write(f"Competitor Style: {competitor_style}, Tone: {competitor_tone}, Expertise: {competitor_expertise}")
+        st.write(f"Difficulty Level: {difficulty_level}")
+        st.write(f"Your Sales Experience: {sales_experience}")
+
+        # Suggesting Sales Resources (based on scenario)
+        if "objection" in scenario.lower():
+            st.write("You might find these resources helpful:")
+            st.write("- [Handling Objections: A Guide](https://www.salestraining.com/objections-guide)")
+            st.write("- [Effective Negotiation Techniques](https://www.salesnegotiation.com/techniques)")
+        elif "upselling" in scenario.lower():
+            st.write("Check out these resources to improve your upselling skills:")
+            st.write("- [How to Master Upselling](https://www.salestraining.com/upselling-guide)")
+        elif "cross-selling" in scenario.lower():
+            st.write("- [Cross-Selling Strategies](https://www.salestraining.com/cross-selling-strategies)")
+
+        # Time-Based Performance Tracking
+        start_time = time.time()
+        st.write("Start negotiating and responding.")
+        end_time = time.time()
+        time_spent = round(end_time - start_time, 2)
+        st.write(f"Time spent on this scenario: {time_spent} seconds")
+
+        # Emotional Intelligence Tracking
+        if emotion_detection:
+            st.write("Emotion detection activated. Analyzing competitor's emotional tone...")
+            if "angry" in selected_response.lower():
+                st.write("- Competitor seems frustrated. Stay calm and show empathy.")
+            elif "sarcastic" in selected_response.lower():
+                st.write("- Competitor might be challenging your approach. Stay positive and assertive.")
+            else:
+                st.write("- Competitor seems neutral. Proceed with your strategy.")
+
+        # Adaptive Scenario Path (dependent on prior responses)
+        scenario_path = st.selectbox("Do you want to continue with the same scenario or switch?", ["Continue", "Switch Scenario"])
+        if scenario_path == "Switch Scenario":
+            st.write("Switching scenario... Choose another scenario to continue training.")
+        elif scenario_path == "Continue":
+            st.write("Continuing the current scenario... Keep practicing!")
+        
+        # Customer Insights (simulating customer persona)
+        customer_persona = random.choice(["Price-sensitive", "Value-driven", "Brand-loyal", "Innovative", "Skeptical"])
+        st.write(f"\n### Customer Persona:")
+        st.write(f"Customer Persona: {customer_persona}")
+        st.write("- Tailor your responses based on the customer's persona for better engagement.")
+
+        # Strategy Recommendations (based on user responses)
+        if "discount" in selected_response.lower():
+            st.write("It seems your competitor is trying to push a discount. Instead of conceding to price, focus on the long-term value.")
+        elif "objection" in selected_response.lower():
+            st.write("You're handling objections well. Keep addressing their concerns and redirecting them back to the value your product provides.")
+        else:
+            st.write("Good pitch! Stay focused on how your product solves the customer's problems, and be ready for follow-up questions.")
+
+        # Emotional Feedback for User's Response
+        user_emotion = st.radio("How do you feel about your response?", ["Confident", "Uncertain", "Defensive", "Optimistic", "Frustrated"])
+        st.write(f"Your emotional feedback: {user_emotion}")
+        if user_emotion == "Frustrated":
+            st.write("Take a deep breath. Focus on the benefits of your product and how it can resolve their pain points.")
+        
+        # Long-Term Strategy Feedback
+        st.write("\n### Long-Term Strategy Feedback:")
+        st.write("- Keep practicing objection handling techniques and pushing for value-based conversations.")
+        st.write("- If you’re dealing with aggressive competitors, focus on staying calm and using facts to support your arguments.")
+    
+    except Exception as e:
+        st.error(f"Error: {e}")
